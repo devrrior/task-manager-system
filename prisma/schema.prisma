@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement()) @map("id")
+  email     String   @unique @map("email")
+  password  String   @map("password")
+  tasks     Task[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  logs      Log[]
+
+  @@map("users")
+}
+
+model Task {
+  id          Int        @id @default(autoincrement()) @map("id")
+  title       String     @map("title") @db.VarChar(255)
+  description String     @map("description") @db.Text
+  status      TaskStatus @map("status")
+  dueDate     DateTime   @map("due_date")
+  comments    Comment[]
+  tags        Tag[]
+  file        File?
+  createdBy   User       @relation(fields: [createdById], references: [id])
+  createdById Int        @map("created_by_id")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+  logs        Log[]
+
+  @@map("tasks")
+}
+
+model Tag {
+  id        Int      @id @default(autoincrement()) @map("id")
+  name      String   @map("name") @db.VarChar(255)
+  task      Task     @relation(fields: [taskId], references: [id])
+  taskId    Int      @map("task_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("tags")
+}
+
+model File {
+  id        Int      @id @default(autoincrement()) @map("id")
+  url       String   @map("url") @db.VarChar(255)
+  type      FileType @map("type")
+  task      Task     @relation(fields: [taskId], references: [id])
+  taskId    Int      @unique @map("task_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("files")
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement()) @map("id")
+  content   String   @map("content") @db.Text
+  task      Task     @relation(fields: [taskId], references: [id])
+  taskId    Int      @map("task_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("comments")
+}
+
+model Log {
+  id        Int      @id @default(autoincrement()) @map("id")
+  action    String   @map("action")
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int      @map("user_id")
+  task      Task     @relation(fields: [taskId], references: [id])
+  taskId    Int      @map("task_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("logs")
+}
+
+enum TaskStatus {
+  PENDING     @map("pending")
+  IN_PROGRESS @map("in_progress")
+  COMPLETED   @map("completed")
+}
+
+enum FileType {
+  PDF @map("pdf")
+  PNG @map("png")
+  JPG @map("jpg")
+}
