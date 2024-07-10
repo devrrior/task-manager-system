@@ -8,9 +8,9 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 interface ResponseFormat {
-  data: any | undefined;
+  data: any;
   success: boolean;
-  message: string | undefined;
+  message: string;
   httpStatus: number;
 }
 
@@ -23,9 +23,10 @@ export class ResponseInterceptor implements NestInterceptor {
         const status = response.statusCode;
 
         return {
-          data: data.data,
-          success: data.success,
-          message: data.message,
+          data: data.data !== undefined ? data.data : data,
+          success: data.success !== undefined ? data.success : true,
+          message:
+            data.message !== undefined ? data.message : 'Request successful',
           httpStatus: status,
         };
       }),
