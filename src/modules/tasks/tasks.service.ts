@@ -8,7 +8,7 @@ import {
 import { PaginationResponseDto } from '../../common/dtos/responses/pagination.response.dto';
 import { CreateTaskRequestDto } from './dtos/requests/create-task.request.dto';
 import { UsersService } from '../users/users.service';
-import { Like, MoreThan, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Task } from './entities/task.entity';
 import { GetTaskResponseDto } from './dtos/responses/get-task.response.dto';
 import { plainToClass, plainToInstance } from 'class-transformer';
@@ -16,6 +16,8 @@ import { CreateTaskResponseDto } from './dtos/responses/create-task.response.dto
 import { GetTaskDetailsResponseDto } from './dtos/responses/get-task-details.response.dto';
 import { UpdateTaskRequestDto } from './dtos/requests/update-task.request.dto';
 import { UpdateTaskResponseDto } from './dtos/responses/update-task.response.dto';
+import { LogsService } from '../logs/logs.service';
+import { TaskAction } from '../logs/enums/task-action.enum';
 
 @Injectable()
 export class TasksService {
@@ -23,6 +25,7 @@ export class TasksService {
     @Inject('TASK_REPOSITORY')
     private readonly taskRepository: Repository<Task>,
     private readonly usersService: UsersService,
+    private readonly logsService: LogsService,
   ) {}
 
   async create(
@@ -39,6 +42,8 @@ export class TasksService {
         dueDate: new Date(body.dueDate),
         createdBy: user,
       });
+
+      await this.logsService.create(TaskAction.CREATE, user, task);
 
       return plainToClass(CreateTaskResponseDto, task, {
         excludeExtraneousValues: true,
@@ -66,6 +71,8 @@ export class TasksService {
     if (task.createdBy.id !== userId) {
       throw new ForbiddenException('You are not allowed to view this task');
     }
+
+    await this.logsService.create(TaskAction.GET_DETAILS, task.createdBy, task);
 
     return plainToInstance(GetTaskDetailsResponseDto, task, {
       excludeExtraneousValues: true,
@@ -97,6 +104,8 @@ export class TasksService {
       });
     });
 
+    await this.logsService.create(TaskAction.GET_ALL, user);
+
     return {
       items: tasksResponse,
       totalItems: totalItem,
@@ -122,6 +131,8 @@ export class TasksService {
         ...body,
       });
 
+      await this.logsService.create(TaskAction.UPDATE, task.createdBy, task);
+
       return plainToClass(UpdateTaskResponseDto, updatedTask, {
         excludeExtraneousValues: true,
       });
@@ -141,6 +152,7 @@ export class TasksService {
 
     try {
       await this.taskRepository.update({ id: taskId }, { isDeleted: true });
+      await this.logsService.create(TaskAction.DELETE, task.createdBy);
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(
@@ -160,59 +172,5 @@ export class TasksService {
     }
 
     return task;
-  }
-
-  async searchTasks(
-    userId: number,
-    keyword: string,
-    status: string,
-    daysRemaining: number,
-    pageNumber: number = 1,
-    pageSize: number = 10,
-  ): Promise<PaginationResponseDto<Task>> {
-    try {
-      const user = await this.usersService.findOneAndEnsureExistById(userId);
-
-      const where: any = {
-        createdBy: {
-          id: user.id,
-        },
-        isDeleted: false,
-      };
-
-      if (keyword) {
-        where.title = Like(`%${keyword}%`);
-      }
-
-      if (status) {
-        where.status = status;
-      }
-
-      if (daysRemaining !== undefined && daysRemaining >= 0) {
-        where.dueDate = MoreThan(new Date());
-      }
-
-      const [tasks, totalItems] = await this.taskRepository.findAndCount({
-        where,
-        skip: (pageNumber - 1) * pageSize,
-        take: pageSize,
-      });
-
-      const tasksResponse = tasks.map((task) =>
-        plainToClass(Task, task, { excludeExtraneousValues: true }),
-      );
-
-      return {
-        items: tasksResponse,
-        totalItems: totalItems,
-        totalPages: Math.ceil(totalItems / pageSize),
-        currentPage: pageNumber,
-      };
-    } catch (error) {
-      if (error.response && error.response.status) {
-        throw error;
-      }
-      throw new InternalServerErrorException('Error searching tasks');
-    }
   }
 }

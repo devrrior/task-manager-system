@@ -8,6 +8,8 @@ import { TasksService } from '../tasks/tasks.service';
 import { CreateTagRequestDto } from './dtos/requests/create-tag.request.dto';
 import { Repository } from 'typeorm';
 import { Tag } from './entities/tag.entity';
+import { GetTagResponseDto } from './dtos/responses/get-tag.response.dto';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class TagsService {
@@ -16,7 +18,10 @@ export class TagsService {
     private readonly tasksService: TasksService,
   ) {}
 
-  async create(body: CreateTagRequestDto, userId: number) {
+  async create(
+    body: CreateTagRequestDto,
+    userId: number,
+  ): Promise<GetTagResponseDto> {
     const task = await this.tasksService.findOneAndEnsureExistById(body.taskId);
 
     if (task.createdBy.id !== userId) {
@@ -29,7 +34,9 @@ export class TagsService {
         task,
       });
 
-      return tag;
+      return plainToClass(GetTagResponseDto, tag, {
+        excludeExtraneousValues: true,
+      });
     } catch (error) {
       throw new InternalServerErrorException(
         'An error occurred while creating the tag',
