@@ -2,6 +2,8 @@
 
 Este repositorio contiene un proyecto desarrollado con NestJS, un framework de Node.js para construir aplicaciones eficientes y escalables en el lado del servidor.
 
+Documentación de la API con Postman: [Task Manager System API](https://documenter.getpostman.com/view/14155546/2sA3e4A9Fu)
+
 ## Configuración del Proyecto
 
 ### Instalación
