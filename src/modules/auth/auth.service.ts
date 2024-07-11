@@ -13,7 +13,7 @@ export class AuthService {
   ) {}
 
   async createTokens(request: CreateTokensRequestDto) {
-    const user = await this.userService.findByEmail(request.email);
+    const user = await this.userService.findOneAndEnsureExistByEmail(request.email);
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -56,7 +56,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid token');
     }
 
-    const user = await this.userService.findByEmail(payload.email);
+    const user = await this.userService.findOneAndEnsureExistByEmail(payload.email);
 
     if (!user) {
       throw new UnauthorizedException('Invalid token');

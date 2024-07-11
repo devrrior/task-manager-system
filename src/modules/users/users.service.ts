@@ -43,7 +43,7 @@ export class UsersService {
     }
   }
 
-  async findByEmail(email: string) {
+  async findOneAndEnsureExistByEmail(email: string) {
     const user = await this.userRepository.findOne({ where: { email } });
 
     if (!user) {
@@ -53,7 +53,7 @@ export class UsersService {
     return user;
   }
 
-  async findById(id: number) {
+  async findOneAndEnsureExistById(id: number) {
     const user = await this.userRepository.findOne({ where: { id } });
 
     if (!user) {

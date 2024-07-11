@@ -50,4 +50,7 @@ export class Task {
 
   @OneToMany(() => Log, (log) => log.task)
   logs: Log[];
+
+  @Column({ name: 'is_deleted', default: false })
+  isDeleted: boolean;
 }

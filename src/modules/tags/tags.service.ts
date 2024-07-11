@@ -17,7 +17,7 @@ export class TagsService {
   ) {}
 
   async create(body: CreateTagRequestDto, userId: number) {
-    const task = await this.tasksService.findById(body.taskId);
+    const task = await this.tasksService.findOneAndEnsureExistById(body.taskId);
 
     if (task.createdBy.id !== userId) {
       throw new ForbiddenException('You are not allowed to tag this task');

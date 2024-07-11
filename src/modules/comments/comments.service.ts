@@ -18,7 +18,7 @@ export class CommentsService {
   ) {}
 
   async create(body: CreateCommentRequestDto, userId: number) {
-    const task = await this.tasksService.findById(body.taskId);
+    const task = await this.tasksService.findOneAndEnsureExistById(body.taskId);
 
     if (task.createdBy.id !== userId) {
       throw new ForbiddenException(
