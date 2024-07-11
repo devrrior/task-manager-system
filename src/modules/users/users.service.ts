@@ -7,9 +7,9 @@ import {
 } from '@nestjs/common';
 import { CreateUserRequestDto } from './dto/requests/create-user.request.dto';
 import { CreateUserResponseDto } from './dto/responses/create-user.response.dto';
-import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { encryptPassword } from './utils/bcryptUtils';
 
 @Injectable()
 export class UsersService {
@@ -20,7 +20,7 @@ export class UsersService {
 
   async create(request: CreateUserRequestDto): Promise<CreateUserResponseDto> {
     try {
-      const hashedPassword = await this.encryptPassword(request.password);
+      const hashedPassword = await encryptPassword(request.password);
       const user = await this.userRepository.save({
         email: request.email,
         password: hashedPassword,
@@ -61,16 +61,5 @@ export class UsersService {
     }
 
     return user;
-  }
-
-  async encryptPassword(password: string): Promise<string> {
-    return await bcrypt.hash(password, 10);
-  }
-
-  async validatePassword(
-    password: string,
-    hashedPassword: string,
-  ): Promise<boolean> {
-    return await bcrypt.compare(password, hashedPassword);
   }
 }

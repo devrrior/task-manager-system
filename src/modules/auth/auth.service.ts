@@ -4,6 +4,7 @@ import { UsersService } from '../users/users.service';
 import { CreateTokensRequestDto } from './dtos/requests/create-tokens.request.dto';
 import { RefreshTokensRequestDto } from './dtos/requests/refresh-tokens.request.dto';
 import { createToken, verifyToken } from './utils/jwtUtils';
+import { validatePassword } from '../users/utils/bcryptUtils';
 
 @Injectable()
 export class AuthService {
@@ -32,13 +33,7 @@ export class AuthService {
     const user = await this.userService.findOneAndEnsureExistByEmail(
       request.email,
     );
-    if (
-      !user ||
-      !(await this.userService.validatePassword(
-        request.password,
-        user.password,
-      ))
-    ) {
+    if (!user || !(await validatePassword(request.password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
 

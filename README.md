@@ -1,73 +1,77 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Proyecto NestJS - Guía de Configuración
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Este repositorio contiene un proyecto desarrollado con NestJS, un framework de Node.js para construir aplicaciones eficientes y escalables en el lado del servidor.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Configuración del Proyecto
 
-## Description
+### Instalación
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+1. Clona el repositorio desde GitHub:
 
-## Installation
+   ```bash
+   git clone https://github.com/devrrior/task-manager-system
+   cd task-manager-system
+   ```
 
-```bash
-$ pnpm install
+2. Instala las dependencias:
+
+   ```bash
+   npm install
+
+   ```
+
+### Archivo .env
+
+Crea un archivo .env en la raíz del proyecto y agrega las siguientes variables de entorno con tus propias configuraciones:
+
+```dotenv
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=Admin123!
+DB_DATABASE=task_manager_sys
+
+# Configuración de claves secretas para tokens JWT
+ACCESS_TOKEN_SECRET_KEY=your_access_token_secret_key
+REFRESH_TOKEN_SECRET_KEY=your_refresh_token_secret_key
+ACCESS_TOKEN_EXPIRATION_MS=86400000   # Tiempo de expiración en milisegundos (24 horas)
+REFRESH_TOKEN_EXPIRATION_MS=2592000000   # Tiempo de expiración en milisegundos (30 días)
 ```
 
-## Running the app
+Asegúrate de reemplazar your_access_token_secret_key y your_refresh_token_secret_key con claves secretas seguras para tu aplicación.
 
-```bash
-# development
-$ pnpm run start
+### Base de Datos MySQL con Docker
 
-# watch mode
-$ pnpm run start:dev
+Si deseas utilizar una base de datos MySQL para desarrollo, puedes usar el siguiente archivo docker-compose.yml que está disponible en el repositorio:
 
-# production mode
-$ pnpm run start:prod
+```yaml
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:latest
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=Admin123!
+      - MYSQL_DATABASE=task_manager_sys
 ```
 
-## Test
+Para ejecutar MySQL con Docker:
 
 ```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+docker-compose up -d
 ```
 
-## Support
+Esto iniciará un contenedor Docker con MySQL y lo hará accesible en localhost:3306.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Ejecutar el Proyecto
 
-## Stay in touch
+Una vez configurado el archivo .env y levantada la base de datos, puedes ejecutar el proyecto NestJS:
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+npm start
 
-## License
+```
 
-Nest is [MIT licensed](LICENSE).
+Esto iniciará la aplicación en modo de desarrollo. Visita http://localhost:3000 para interactuar con la API.
