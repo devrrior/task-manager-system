@@ -6,6 +6,7 @@ import { TasksModule } from './modules/tasks/tasks.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { CommentsModule } from './modules/comments/comments.module';
+import { TagsModule } from './modules/tags/tags.module';
 import configuration from './common/config/configuration';
 
 @Module({
@@ -19,6 +20,7 @@ import configuration from './common/config/configuration';
       isGlobal: true,
     }),
     CommentsModule,
+    TagsModule,
   ],
   controllers: [],
   providers: [DatabaseService],
