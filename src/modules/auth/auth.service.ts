@@ -12,38 +12,37 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async createTokens(request: CreateTokensRequestDto) {
-    const user = await this.userService.findOneAndEnsureExistByEmail(request.email);
-
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    const isPasswordValid = await this.userService.validatePassword(
-      request.password,
-      user.password,
-    );
-
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
+  private async generateTokens(email: string, id: number) {
     const accessToken = createToken(
-      { email: user.email, id: user.id },
+      { email, id },
       this.configService.get<string>('ACCESS_TOKEN_SECRET_KEY'),
       this.configService.get<string>('ACCESS_TOKEN_EXPIRATION_MS'),
     );
 
     const refreshToken = createToken(
-      { email: user.email, id: user.id },
+      { email, id },
       this.configService.get<string>('REFRESH_TOKEN_SECRET_KEY'),
       this.configService.get<string>('REFRESH_TOKEN_EXPIRATION_MS'),
     );
 
-    return {
-      accessToken,
-      refreshToken,
-    };
+    return { accessToken, refreshToken };
+  }
+
+  async createTokens(request: CreateTokensRequestDto) {
+    const user = await this.userService.findOneAndEnsureExistByEmail(
+      request.email,
+    );
+    if (
+      !user ||
+      !(await this.userService.validatePassword(
+        request.password,
+        user.password,
+      ))
+    ) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    return this.generateTokens(user.email, user.id);
   }
 
   async refreshTokens(request: RefreshTokensRequestDto) {
@@ -56,27 +55,13 @@ export class AuthService {
       throw new UnauthorizedException('Invalid token');
     }
 
-    const user = await this.userService.findOneAndEnsureExistByEmail(payload.email);
-
+    const user = await this.userService.findOneAndEnsureExistByEmail(
+      payload.email,
+    );
     if (!user) {
       throw new UnauthorizedException('Invalid token');
     }
 
-    const accessToken = createToken(
-      { email: user.email, id: user.id },
-      this.configService.get<string>('ACCESS_TOKEN_SECRET_KEY'),
-      this.configService.get<string>('ACCESS_TOKEN_EXPIRATION_MS'),
-    );
-
-    const refreshToken = createToken(
-      { email: user.email, id: user.id },
-      this.configService.get<string>('REFRESH_TOKEN_SECRET_KEY'),
-      this.configService.get<string>('REFRESH_TOKEN_EXPIRATION_MS'),
-    );
-
-    return {
-      accessToken,
-      refreshToken,
-    };
+    return this.generateTokens(user.email, user.id);
   }
 }
