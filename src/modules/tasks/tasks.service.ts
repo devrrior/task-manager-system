@@ -61,7 +61,6 @@ export class TasksService {
     pageNumber: number = 1,
     pageSize: number = 10,
   ): Promise<PaginationResponseDto<Task>> {
-    console.log(pageNumber);
     const skip = (pageNumber - 1) * pageSize;
 
     const tasks = await this.databaseService.task.findMany({

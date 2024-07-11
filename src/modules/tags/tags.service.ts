@@ -35,7 +35,6 @@ export class TagsService {
 
       return tag;
     } catch (error) {
-      console.log(error);
       throw new InternalServerErrorException(
         'An error occurred while creating the tag',
       );

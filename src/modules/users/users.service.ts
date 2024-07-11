@@ -33,7 +33,6 @@ export class UsersService {
       if (error.code === 'P2002') {
         throw new ConflictException('Email already exists');
       } else {
-        console.log(error);
         throw new InternalServerErrorException(
           'An error occurred while creating the user',
         );

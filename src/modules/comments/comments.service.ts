@@ -37,7 +37,6 @@ export class CommentsService {
 
       return comment;
     } catch (error) {
-      console.log(error);
       throw new InternalServerErrorException(
         'An error occurred while creating the comment',
       );
