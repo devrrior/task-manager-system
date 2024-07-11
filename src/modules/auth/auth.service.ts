@@ -63,13 +63,13 @@ export class AuthService {
     }
 
     const accessToken = createToken(
-      { email: user.email, sub: user.id },
+      { email: user.email, id: user.id },
       this.configService.get<string>('ACCESS_TOKEN_SECRET_KEY'),
       this.configService.get<string>('ACCESS_TOKEN_EXPIRATION_MS'),
     );
 
     const refreshToken = createToken(
-      { email: user.email, sub: user.id },
+      { email: user.email, id: user.id },
       this.configService.get<string>('REFRESH_TOKEN_SECRET_KEY'),
       this.configService.get<string>('REFRESH_TOKEN_EXPIRATION_MS'),
     );
