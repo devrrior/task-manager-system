@@ -5,6 +5,7 @@ import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [UsersModule],
+  exports: [TasksService],
   controllers: [TasksController],
   providers: [TasksService],
 })

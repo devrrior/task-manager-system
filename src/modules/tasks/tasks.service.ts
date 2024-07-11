@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { DatabaseService } from 'src/common/database/database.service';
 import { PaginationResponseDto } from '../../common/dtos/responses/pagination.response.dto';
 import { Task } from '@prisma/client';
@@ -9,11 +13,11 @@ import { UsersService } from '../users/users.service';
 export class TasksService {
   constructor(
     private readonly databaseService: DatabaseService,
-    private readonly userService: UsersService,
+    private readonly usersService: UsersService,
   ) {}
 
   async create(body: CreateTaskRequestDto, userId: number): Promise<Task> {
-    const user = await this.userService.findById(userId);
+    const user = await this.usersService.findById(userId);
 
     try {
       const task = await this.databaseService.task.create({
@@ -36,6 +40,20 @@ export class TasksService {
         'An error occurred while creating the task',
       );
     }
+  }
+
+  async findById(id: number): Promise<Task> {
+    const task = await this.databaseService.task.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!task) {
+      throw new NotFoundException('Task not found');
+    }
+
+    return task;
   }
 
   async findAllPaginated(

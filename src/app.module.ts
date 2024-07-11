@@ -5,6 +5,7 @@ import { DatabaseModule } from './common/database/database.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { CommentsModule } from './modules/comments/comments.module';
 import configuration from './common/config/configuration';
 
 @Module({
@@ -17,6 +18,7 @@ import configuration from './common/config/configuration';
       load: [configuration],
       isGlobal: true,
     }),
+    CommentsModule,
   ],
   controllers: [],
   providers: [DatabaseService],
