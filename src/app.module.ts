@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { UsersModule } from './modules/users/users.module';
-import { DatabaseService } from './common/database/database.service';
 import { DatabaseModule } from './common/database/database.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { CommentsModule } from './modules/comments/comments.module';
 import { TagsModule } from './modules/tags/tags.module';
+import { LogsModule } from './modules/logs/logs.module';
 import configuration from './common/config/configuration';
+import { databaseProviders } from './common/database/database.provider';
 
 @Module({
   imports: [
@@ -15,14 +16,15 @@ import configuration from './common/config/configuration';
     DatabaseModule,
     TasksModule,
     AuthModule,
+    CommentsModule,
+    TagsModule,
+    LogsModule,
     ConfigModule.forRoot({
       load: [configuration],
       isGlobal: true,
     }),
-    CommentsModule,
-    TagsModule,
   ],
   controllers: [],
-  providers: [DatabaseService],
+  providers: [...databaseProviders],
 })
 export class AppModule {}

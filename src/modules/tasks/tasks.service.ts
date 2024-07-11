@@ -1,18 +1,20 @@
 import {
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { DatabaseService } from 'src/common/database/database.service';
 import { PaginationResponseDto } from '../../common/dtos/responses/pagination.response.dto';
-import { Task } from '@prisma/client';
 import { CreateTaskRequestDto } from './dtos/requests/create-task.request.dto';
 import { UsersService } from '../users/users.service';
+import { Repository } from 'typeorm';
+import { Task } from './entities/task.entity';
 
 @Injectable()
 export class TasksService {
   constructor(
-    private readonly databaseService: DatabaseService,
+    @Inject('TASK_REPOSITORY')
+    private readonly taskRepository: Repository<Task>,
     private readonly usersService: UsersService,
   ) {}
 
@@ -20,18 +22,12 @@ export class TasksService {
     const user = await this.usersService.findById(userId);
 
     try {
-      const task = await this.databaseService.task.create({
-        data: {
-          title: body.title,
-          description: body.description,
-          status: body.status,
-          dueDate: new Date(body.dueDate),
-          createdBy: {
-            connect: {
-              id: user.id,
-            },
-          },
-        },
+      const task = await this.taskRepository.save({
+        title: body.title,
+        description: body.description,
+        status: body.status,
+        dueDate: new Date(body.dueDate),
+        createdBy: user,
       });
 
       return task;
@@ -43,10 +39,9 @@ export class TasksService {
   }
 
   async findById(id: number): Promise<Task> {
-    const task = await this.databaseService.task.findUnique({
-      where: {
-        id,
-      },
+    const task = await this.taskRepository.findOne({
+      where: { id },
+      relations: ['createdBy'],
     });
 
     if (!task) {
@@ -61,17 +56,18 @@ export class TasksService {
     pageNumber: number = 1,
     pageSize: number = 10,
   ): Promise<PaginationResponseDto<Task>> {
+    const user = await this.usersService.findById(userId);
     const skip = (pageNumber - 1) * pageSize;
 
-    const tasks = await this.databaseService.task.findMany({
+    const [tasks, totalItem] = await this.taskRepository.findAndCount({
       where: {
-        createdById: userId,
+        createdBy: {
+          id: user.id,
+        },
       },
       skip,
       take: pageSize,
     });
-
-    const totalItem = await this.databaseService.task.count();
 
     return {
       items: tasks,

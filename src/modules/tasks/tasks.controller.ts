@@ -29,7 +29,7 @@ export class TasksController {
     };
   }
 
-  @Get(':id')
+  @Get()
   @UseGuards(AuthGuard)
   async findAll(@Query() query: PaginationRequestDto, @Request() req: Request) {
     const userId = req['user'].id;
