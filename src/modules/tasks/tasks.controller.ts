@@ -1,11 +1,33 @@
-import { Controller, Get, Query, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { PaginationRequestDto } from 'src/common/dtos/requests/pagination.request.dto';
+import { CreateTaskRequestDto } from './dtos/requests/create-task.request.dto';
 
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
+
+  @Post()
+  @UseGuards(AuthGuard)
+  async create(@Body() body: CreateTaskRequestDto, @Request() req: Request) {
+    const userId = req['user'].id;
+
+    const data = await this.tasksService.create(body, userId);
+    return {
+      data,
+      success: true,
+      message: 'Task created',
+    };
+  }
 
   @Get(':id')
   @UseGuards(AuthGuard)

@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateUserRequestDto } from './dto/requests/create-user.request.dto';
 import { DatabaseService } from 'src/common/database/database.service';
@@ -41,11 +42,31 @@ export class UsersService {
   }
 
   async findByEmail(email: string) {
-    return await this.databaseService.user.findUnique({
+    const user = await this.databaseService.user.findUnique({
       where: {
         email,
       },
     });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
+  async findById(id: number) {
+    const user = await this.databaseService.user.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
   }
 
   async encryptPassword(password: string): Promise<string> {
