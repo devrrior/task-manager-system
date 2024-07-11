@@ -8,8 +8,8 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('tokens')
-  async createTokens(@Body() request: CreateTokensRequestDto) {
-    const data = await this.authService.createTokens(request);
+  async createTokens(@Body() body: CreateTokensRequestDto) {
+    const data = await this.authService.createTokens(body);
     return {
       data: data,
       success: true,
@@ -18,8 +18,8 @@ export class AuthController {
   }
 
   @Post('tokens/refresh')
-  async refreshTokens(@Body() request: RefreshTokensRequestDto) {
-    const data = await this.authService.refreshTokens(request);
+  async refreshTokens(@Body() body: RefreshTokensRequestDto) {
+    const data = await this.authService.refreshTokens(body);
     return {
       data: data,
       success: true,
