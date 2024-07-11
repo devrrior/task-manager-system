@@ -7,12 +7,18 @@ import { Task } from '@prisma/client';
 export class TasksService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async findAll(
-    page: number = 1,
+  async findAllPaginated(
+    userId: number,
+    pageNumber: number = 1,
     pageSize: number = 10,
   ): Promise<PaginationResponseDto<Task>> {
-    const skip = (page - 1) * pageSize;
+    console.log(pageNumber);
+    const skip = (pageNumber - 1) * pageSize;
+
     const tasks = await this.databaseService.task.findMany({
+      where: {
+        createdById: userId,
+      },
       skip,
       take: pageSize,
     });
@@ -23,7 +29,7 @@ export class TasksService {
       items: tasks,
       totalItems: totalItem,
       totalPages: Math.ceil(totalItem / pageSize),
-      currentPage: page,
+      currentPage: pageNumber,
     };
   }
 }

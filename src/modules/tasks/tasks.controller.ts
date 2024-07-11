@@ -1,19 +1,24 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, Request, UseGuards } from '@nestjs/common';
 import { TasksService } from './tasks.service';
+import { AuthGuard } from '../auth/auth.guard';
+import { PaginationRequestDto } from 'src/common/dtos/requests/pagination.request.dto';
 
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
-  @Get()
-  async findAll(
-    @Query('page') page: number,
-    @Query('pageSize') pageSize: number,
-  ) {
-    const pageNumber = page ? parseInt(page.toString(), 10) : 1;
-    const size = pageSize ? parseInt(pageSize.toString(), 10) : 10;
+  @Get(':id')
+  @UseGuards(AuthGuard)
+  async findAll(@Query() query: PaginationRequestDto, @Request() req: Request) {
+    const userId = req['user'].id;
 
-    const data = await this.tasksService.findAll(pageNumber, size);
+    const { pageNumber, pageSize } = query;
+
+    const data = await this.tasksService.findAllPaginated(
+      userId,
+      pageNumber,
+      pageSize,
+    );
 
     return {
       data,
