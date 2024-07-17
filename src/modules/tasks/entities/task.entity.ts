@@ -13,7 +13,7 @@ import { Tag } from 'src/modules/tags/entities/tag.entity';
 import { Comment } from 'src/modules/comments/entities/comment.entity';
 import { Log } from 'src/modules/logs/entities/log.entity';
 
-@Entity('tasks')
+@Entity({ name: 'tasks' })
 export class Task {
   @PrimaryGeneratedColumn()
   id: number;

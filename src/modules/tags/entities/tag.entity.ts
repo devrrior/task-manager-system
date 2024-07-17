@@ -7,7 +7,7 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 
-@Entity('tags')
+@Entity({ name: 'tags' })
 export class Tag {
   @PrimaryGeneratedColumn()
   id: number;
