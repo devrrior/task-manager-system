@@ -8,7 +8,6 @@ import { CommentsModule } from './modules/comments/comments.module';
 import { TagsModule } from './modules/tags/tags.module';
 import { LogsModule } from './modules/logs/logs.module';
 import configuration from './common/config/configuration';
-import { databaseProviders } from './common/database/database.provider';
 
 @Module({
   imports: [
@@ -25,6 +24,6 @@ import { databaseProviders } from './common/database/database.provider';
     }),
   ],
   controllers: [],
-  providers: [...databaseProviders],
+  providers: [],
 })
 export class AppModule {}
